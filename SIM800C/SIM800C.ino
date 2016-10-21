@@ -47,8 +47,8 @@ String CSQ = "";                                    // Уровень сигнала приема
 unsigned long time;                                 // Переменная для суточного сброса
 unsigned long time_day = 86400000;                  // Переменная миллисекунд в сутках
 unsigned long previousMillis = 0;
-unsigned long interval = 20000;                     // Интервал передачи данных 60 секунд
-//unsigned long interval = 300000;                  // Интервал передачи данных 5 минут
+//unsigned long interval = 20000;                     // Интервал передачи данных 60 секунд
+unsigned long interval = 300000;                  // Интервал передачи данных 5 минут
 
 //String MASTER = "+79162632701";                   //укажите  телефон хозяина
 String MASTER = "";                                 //укажите  телефон хозяина
@@ -114,7 +114,7 @@ String formHeader()
 
 void gprs_send(String data) 
 {
-  con.print("Reques. ");
+  con.print("Requesting ");
   con.print(url1);
   con.print('?');
   con.println(data);
@@ -162,8 +162,8 @@ void gprs_send(String data)
   }
 
   // Теперь мы получили полезную нагрузку
-  // con.print("[Payload]");
-   //con.println(gprs.buffer);
+   con.print("[Payload] ");
+   con.println(gprs.buffer);
    String command = gprs.buffer;                       // Получить строку данных с сервера
    String commEXE = command.substring(0, 2);           // Выделить строку с командой
    int var = commEXE.toInt();                          // Преобразовать строку команды в число 

@@ -12,11 +12,112 @@
 #define PIN_TX           7                             // Подключить  к выводу 7 сигнал RX модуля GPRS
 #define PIN_RX           8                             // Подключить  к выводу 8 сигнал TX модуля GPRS
 
-// change this to the serial UART which SIM800 is attached to
-//#define SIM_SERIAL Serial1
 
 // define DEBUG to one serial UART to enable debug information output
 //#define DEBUG Serial
+
+
+const char  txt_AT[]                 PROGMEM  = "ATE0";
+const char  txt_IPR[]                PROGMEM  = "AT+IPR=19200";
+const char  txt_CFUN[]               PROGMEM  = "AT+CFUN=1";
+const char  txt_CMGF1[]              PROGMEM  = "AT+CMGF=1";
+const char  txt_CLIP[]               PROGMEM  = "AT+CLIP=1";
+const char  txt_CSCS[]               PROGMEM  = "AT+CSCS=\"GSM\"";
+const char  txt_CNMI[]               PROGMEM  = "AT+CNMI=2,2";
+const char  txt_CREG[]               PROGMEM  = "AT+CREG?";
+const char  txt_CSQ[]                PROGMEM  = "AT+CSQ";
+const char  txt_CGATT[]              PROGMEM  = "AT+CGATT?";
+const char  txt_SAPBR0[]             PROGMEM  = "AT+SAPBR=3,1,\"Contype\",\"GPRS\"";
+const char  txt_internet_mts_ru[]    PROGMEM  = "internet.mts.ru";
+const char  txt_MTSB[]               PROGMEM  = "MTS";
+const char  txt_mts[]                PROGMEM  = "mts";
+const char  txt_BeelineB[]           PROGMEM  = "Beeline";
+const char  txt_internet_beeline[]   PROGMEM  = "internet.beeline.ru";
+const char  txt_beeline[]            PROGMEM  = "beeline";
+const char  txt_MegaFon[]            PROGMEM  = "MegaFon";
+const char  txt_internet[]           PROGMEM  = "internet"; 
+const char  txt_MEGAFONB[]           PROGMEM  = "MEGAFON";
+const char  txt_TELE2[]              PROGMEM  = "TELE2";
+const char  txt_internet_TELE2[]     PROGMEM  = "internet.TELE2.ru";
+const char  txt_SAPBR1[]             PROGMEM  = "AT+SAPBR=3,1,\"APN\",\"";
+const char  txt_SAPBR2[]             PROGMEM  = "AT+SAPBR=3,1,\"USER\",\""; 
+const char  txt_SAPBR3[]             PROGMEM  = "AT+SAPBR=3,1,\"PWD\",\"";
+const char  txt_CGDCONT[]            PROGMEM  = "AT+CGDCONT=1,\"IP\",\"";
+const char  txt_SAPBR4[]             PROGMEM  = "AT+SAPBR=1,1";
+const char  txt_SAPBR5[]             PROGMEM  = "AT+SAPBR=2,1";
+const char  txt_CMGF2[]              PROGMEM  = "AT+CMGF=1";
+const char  txt_CPMS[]               PROGMEM  = "AT+CPMS=\"SM\",\"SM\",\"SM\"";
+const char  txt_GSN[]                PROGMEM  = "AT+GSN";
+const char  txt_COPS[]               PROGMEM  = "AT+COPS?";
+const char  txt_OK[]                 PROGMEM  = "OK\r";
+const char  txt_ERROR[]              PROGMEM  = "ERROR\r"; 
+const char  txt_CIPGSMLOC[]          PROGMEM  = "AT+CIPGSMLOC=1,1";
+const char  txt_HTTPTERM[]           PROGMEM  = "AT+HTTPTERM";
+const char  txt_HTTPINIT[]           PROGMEM  = "AT+HTTPINIT";
+const char  txt_HTTPPARA1[]          PROGMEM  = "AT+HTTPPARA=\"CID\",1";
+const char  txt_HTTPPARA2[]          PROGMEM  = "AT+HTTPPARA=\"URL\",\"";
+const char  txt_HTTPACTION1[]        PROGMEM  = "AT+HTTPACTION=0";
+const char  txt_HTTPPARA3[]          PROGMEM  = "AT+HTTPPARA=\"URL\",\"";
+const char  txt_HTTPACTION2[]        PROGMEM  = "AT+HTTPACTION=0";
+const char  txt_200[]                PROGMEM  = "0,200";
+const char  txt_60[]                 PROGMEM  = "0,60";
+const char  txt_HTTPREAD1[]          PROGMEM  = "AT+HTTPREAD";
+const char  txt_HTTPREAD2[]          PROGMEM  = "+HTTPREAD: ";
+const char  txt_Error1[]             PROGMEM  = "Error";
+const char  txt_r_n[]                PROGMEM  = "\r\n";
+
+const char* const table_message[] PROGMEM =
+{
+ txt_AT,                      // 0 "AT";
+ txt_IPR,                     // 1 "AT+IPR=19200";
+ txt_CFUN,                    // 2 "AT+CFUN=1"
+ txt_CMGF1,                   // 3 "AT+CMGF=1"
+ txt_CLIP,                    // 4 "AT+CLIP=1"
+ txt_CSCS,                    // 5 "AT+CSCS=\"GSM\""
+ txt_CNMI,                    // 6 "AT+CNMI=2,2"
+ txt_CREG,                    // 7 "AT+CREG?"
+ txt_CSQ,                     // 8 "AT+CSQ"
+ txt_CGATT,                   // 9 "AT+CGATT?"
+ txt_SAPBR0,                  // 10 "AT+SAPBR=3,1,\"Contype\",\"GPRS\""
+ txt_internet_mts_ru,         // 11 "internet.mts.ru"
+ txt_MTSB,                    // 12 "MTS";
+ txt_mts,                     // 13 "mts
+ txt_BeelineB,                // 14 "Beeline";
+ txt_internet_beeline,        // 15 "internet.beeline.ru";
+ txt_beeline,                 // 16 "beeline";
+ txt_MegaFon,                 // 17 "MegaFon";
+ txt_internet,                // 18 "internet"; 
+ txt_MEGAFONB,                // 19 "MEGAFON";
+ txt_TELE2,                   // 20 "TELE2";
+ txt_internet_TELE2,          // 21 "internet.TELE2.ru";
+ txt_SAPBR1,                  // 22 "AT+SAPBR=3,1,\"APN\",\"";
+ txt_SAPBR2,                  // 23 "AT+SAPBR=3,1,\"USER\",\""; 
+ txt_SAPBR3,                  // 24 "AT+SAPBR=3,1,\"PWD\",\"";
+ txt_CGDCONT,                 // 25 "AT+CGDCONT=1,\"IP\",\"";
+ txt_SAPBR4,                  // 26 "AT+SAPBR=1,1";
+ txt_SAPBR5,                  // 27 "AT+SAPBR=2,1";
+ txt_CMGF2,                   // 28 "AT+CMGF=1";
+ txt_CPMS,                    // 29 "AT+CPMS=\"SM\",\"SM\",\"SM\"";
+ txt_GSN,                     // 30 "AT+GSN";
+ txt_COPS,                    // 31 "AT+COPS?";
+ txt_OK,                      // 32 "OK\r";
+ txt_ERROR,                   // 33 "ERROR\r"; 
+ txt_CIPGSMLOC,               // 34 "AT+CIPGSMLOC=1,1";
+ txt_HTTPTERM,                // 35 "AT+HTTPTERM";
+ txt_HTTPINIT,                // 36 "AT+HTTPINIT";
+ txt_HTTPPARA1,               // 37 "AT+HTTPPARA=\"CID\",1";
+ txt_HTTPPARA2,               // 38 "AT+HTTPPARA=\"URL\",\"";
+ txt_HTTPACTION1,             // 39 "AT+HTTPACTION=0";
+ txt_HTTPPARA3,               // 40 "AT+HTTPPARA=\"URL\",\"";
+ txt_HTTPACTION2,             // 41 "AT+HTTPACTION=0";
+ txt_200,                     // 42 "0,200" ;
+ txt_60,                      // 43"0,60";
+ txt_HTTPREAD1,               // 44 "AT+HTTPREAD";
+ txt_HTTPREAD2,               // 45 "+HTTPREAD: ";
+ txt_Error1,                  // 46 "Error";
+ txt_r_n                      // 47 "\r\n";  
+};
+
 
 typedef enum {
     HTTP_DISABLED = 0,
@@ -104,5 +205,8 @@ private:
 	int _PWR_On           ;                            // Включение питания модуля SIM800
     int _SIM800_RESET_PIN ;                            // Сброс модуля SIM800
     int _LED13            ;                             // Индикация светодиодом
+	char bufcom[40];
+	char bufcom1[20];
+	int ch = 0;
 };
 
