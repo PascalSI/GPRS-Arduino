@@ -276,17 +276,18 @@ bool CGPRS_SIM800::checkSMSU()
 {
  if (SIM_SERIAL.available())             //есть данные от GSM модуля
  {          
-    delay(100);                        //выждем, чтобы строка успела попасть в порт целиком раньше чем будет считана
+    delay(100);                          //выждем, чтобы строка успела попасть в порт целиком раньше чем будет считана
     while (SIM_SERIAL.available())       //есть данные от GSM модуля
 	{    
       ch = SIM_SERIAL.read();
-      val += char(ch);                 //сохраняем входную строку в переменную val
+      val += char(ch);                   //сохраняем входную строку в переменную val
       delay(10);
     }
     return true;
   }
   return false; 
 }
+
 
 int CGPRS_SIM800::getSignalQuality()
 {

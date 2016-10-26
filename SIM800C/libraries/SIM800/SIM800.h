@@ -148,7 +148,6 @@ public:
 	// byte setup(const char* apn, const char* user, const char* pwd);
     // get network operator name
     bool getOperatorName();
-
 	bool getIMEI();
     // check for incoming SMS
     bool checkSMS();
