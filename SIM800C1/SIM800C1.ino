@@ -15,19 +15,19 @@
 static const char* url1 = "http://vps3908.vps.host.ru/recieveReadings.php";
 
 
-#define PWR_On          12                          // Включение питания модуля SIM800
-#define SIM800_RESET_PIN 3                          // Сброс модуля SIM800
+#define PWR_On           5                          // Включение питания модуля SIM800
+#define SIM800_RESET_PIN 6                          // Сброс модуля SIM800
 #define LED13           13                          // Индикация светодиодом
-//#define port1           11                          // Порт управления внешними устройствами
-//#define port2           12                          // Порт управления внешними устройствами
+#define port1           11                          // Порт управления внешними устройствами
+#define port2           12                          // Порт управления внешними устройствами
 
 
                                                     // Подключить  к выводу 7 сигнал RX модуля GPRS. Установить в библиотеке SIM800.h
 //#define COMMON_ANODE
                                                     // Подключить  к выводу 8 сигнал TX модуля GPRS. Установить в библиотеке SIM800.h  
-#define LED_RED       9                             // Индикация светодиодом RED
-#define LED_BLUE     11                             // Индикация светодиодом BLUE
-#define LED_GREEN    10                             // Индикация светодиодом GREEN
+#define LED_RED      10                             // Индикация светодиодом RED
+#define LED_BLUE     14                             // Индикация светодиодом BLUE
+#define LED_GREEN    15                             // Индикация светодиодом GREEN
 
 #define COLOR_NONE LOW, LOW, LOW
 #define COLOR_RED HIGH, LOW, LOW
