@@ -18,6 +18,9 @@ static const char* url1 = "http://vps3908.vps.host.ru/recieveReadings.php";
 #define PWR_On           5                          // Включение питания модуля SIM800
 #define SIM800_RESET_PIN 6                          // Сброс модуля SIM800
 #define LED13           13                          // Индикация светодиодом
+#define NETLIGHT         3                          // Индикация NETLIGHT
+#define STATUS           9                          // Индикация STATUS
+
 #define port1           11                          // Порт управления внешними устройствами
 #define port2           12                          // Порт управления внешними устройствами
 
@@ -354,6 +357,8 @@ void setup()
 	pinMode(LED_RED,  OUTPUT);
 	pinMode(LED_BLUE, OUTPUT);
 	pinMode(LED_GREEN,OUTPUT);
+	pinMode(NETLIGHT ,INPUT);     // Индикация NETLIGHT
+	pinMode(STATUS ,INPUT);       // Индикация STATUS
 
 	setColor(COLOR_RED);
 	delay(300);
