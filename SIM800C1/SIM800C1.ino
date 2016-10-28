@@ -29,8 +29,8 @@ static const char* url1 = "http://vps3908.vps.host.ru/recieveReadings.php";
 //#define COMMON_ANODE
                                                     // Подключить  к выводу 8 сигнал TX модуля GPRS. Установить в библиотеке SIM800.h  
 #define LED_RED      10                             // Индикация светодиодом RED
-#define LED_BLUE     14                             // Индикация светодиодом BLUE
-#define LED_GREEN    15                             // Индикация светодиодом GREEN
+#define LED_BLUE     15                             // Индикация светодиодом BLUE
+#define LED_GREEN    14                             // Индикация светодиодом GREEN
 
 #define COLOR_NONE LOW, LOW, LOW
 #define COLOR_RED HIGH, LOW, LOW
@@ -53,7 +53,7 @@ String CSQ = "";                                    // Уровень сигнала приема
 unsigned long time;                                 // Переменная для суточного сброса
 unsigned long time_day = 86400000;                  // Переменная миллисекунд в сутках
 unsigned long previousMillis = 0;
-//unsigned long interval = 10000;                     // Интервал передачи данных 30 секунд
+//unsigned long interval = 15000;                     // Интервал передачи данных 30 секунд
 unsigned long interval = 300000;                  // Интервал передачи данных 5 минут
 
 //char test_tel[13] = "+79160000000";               // укажите  телефон хозяина
@@ -476,10 +476,12 @@ void setup()
  }
 
 
+	setColor(COLOR_BLUE);
+	sendTemps();
+	setColor(COLOR_GREEN);
 
-
-  con.println("SIM800 setup end");
-  time = millis();                                       // Старт отсчета суток
+	con.println("\nSIM800 setup end");
+	time = millis();                                       // Старт отсчета суток
 }
 
 void loop()
