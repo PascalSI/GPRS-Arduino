@@ -71,7 +71,7 @@ int dataport1 = 0;
 int dataport2 = 0;
 
 
-uint8_t oneWirePins[]={4, 5, 6};                    //OneWire DS18x20 temperature sensors on these wires
+uint8_t oneWirePins[]={16, 17, 4};                    //OneWire DS18x20 temperature sensors on these wires
 uint8_t oneWirePinsCount=sizeof(oneWirePins)/sizeof(int);
 
 OneWire ds18x20_1(oneWirePins[0]);
@@ -353,7 +353,10 @@ void setup()
 {
 	con.begin(19200);
 	con.println("SIM800 setup start");
-
+	//pinMode(SIM800_RESET_PIN, OUTPUT);
+	//pinMode(LED13,    OUTPUT);
+	//pinMode(PWR_On,   OUTPUT);
+	//digitalWrite(SIM800_RESET_PIN,   LOW);               // Сигнал сброс в исходное состояние
 	pinMode(LED_RED,  OUTPUT);
 	pinMode(LED_BLUE, OUTPUT);
 	pinMode(LED_GREEN,OUTPUT);
@@ -458,6 +461,22 @@ void setup()
  //{
 	//pinMode(port2,   INPUT); 
  //}
+
+ if(EEPROM.read(0)!=55)
+ {
+
+	 Serial.println ("Start clear EEPROM");
+	 for(int i = 0; i<1023;i++)
+	 {
+		 EEPROM.write(i,0);
+	 }
+	  EEPROM.write(0,55);
+	 Serial.println ("Clear EEPROM End");
+
+ }
+
+
+
 
   con.println("SIM800 setup end");
   time = millis();                                       // Старт отсчета суток

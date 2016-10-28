@@ -24,13 +24,19 @@ bool CGPRS_SIM800::init(int PWR_On,int SIM800_RESET_PIN,int LED13)
 	digitalWrite(_SIM800_RESET_PIN,   LOW);               // Сигнал сброс в исходное состояние
 	digitalWrite(_LED13,    LOW);
 	digitalWrite(_PWR_On,   HIGH);                        // Кратковременно отключаем питание модуля GPRS
-	delay(300);
+	delay(1000);
 	digitalWrite(_LED13,    HIGH);
-	digitalWrite(_PWR_On,   LOW);
-	delay(1000);                           
-	digitalWrite(_SIM800_RESET_PIN,   HIGH);              // Производим сброс модема после включения питания
-	delay(300);
-	digitalWrite(_SIM800_RESET_PIN,   LOW);               
+	digitalWrite(_PWR_On,   LOW);                         // Включаем питание модуля
+	delay(2000);                                          // Ожидаем переходные процессы
+	digitalWrite(_LED13,    LOW);
+	delay(300);  
+	digitalWrite(_PWR_On,   HIGH); 
+	//digitalWrite(_SIM800_RESET_PIN,   HIGH);              // Производим сброс модема после включения питания
+	//delay(1000);
+	//digitalWrite(_SIM800_RESET_PIN,   LOW);    
+	//digitalWrite(_LED13,    LOW);
+	//delay(300);  
+	//digitalWrite(_PWR_On,   HIGH); 
     delay(3000);
 
     if (sendCommand("AT")) 
@@ -56,6 +62,7 @@ bool CGPRS_SIM800::init(int PWR_On,int SIM800_RESET_PIN,int LED13)
 		strcpy_P(bufcom, (char*)pgm_read_word(&(table_message[6])));
 		sendCommand(bufcom);                                        // отображение смс в терминале сразу после приема (без этого 
 		//sendCommand("AT+CNMI=2,2");                               // отображение смс в терминале сразу после приема (без этого сообщения молча падают в память)tln("AT+CSCS=\"GSM\""); 
+	  //  sendCommand("AT+IFC=2,2");   
 		return true;
     }
     return false;

@@ -24,12 +24,12 @@ bool CGPRS_SIM800::init(int PWR_On,int SIM800_RESET_PIN,int LED13)
 	digitalWrite(_SIM800_RESET_PIN,   LOW);               // Сигнал сброс в исходное состояние
 	digitalWrite(_LED13,    LOW);
 	digitalWrite(_PWR_On,   HIGH);                        // Кратковременно отключаем питание модуля GPRS
-	delay(1300);
+	delay(2000);
 	digitalWrite(_LED13,    HIGH);
 	digitalWrite(_PWR_On,   LOW);
-	delay(1000);                           
+	delay(1500);                           
 	digitalWrite(_SIM800_RESET_PIN,   HIGH);              // Производим сброс модема после включения питания
-	delay(600);
+	delay(1200);
 	digitalWrite(_SIM800_RESET_PIN,   LOW);               
     delay(3000);
 
