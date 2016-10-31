@@ -46,16 +46,16 @@ String imei = "";
 String CSQ = "";                                    // Уровень сигнала приема
 //String header = "";
 //String imei = "861445030362268";                  // Тест IMEI
-#define DELIM "&"
-//#define DELIM "@"
+//#define DELIM "&"
+#define DELIM "@"
 //char mydata[] = "t1=861445030362268@04/01/02,15:22:52 00@24.50@25.60";
 // тел Мегафон +79258110171
 
 unsigned long time;                                 // Переменная для суточного сброса
 unsigned long time_day = 86400;                     // Переменная секунд в сутках
 unsigned long previousMillis = 0;
-//unsigned long interval = 30;                      // Интервал передачи данных 30 секунд
-unsigned long interval = 300;                       // Интервал передачи данных 5 минут
+//unsigned long interval = 30;                        // Интервал передачи данных 30 секунд
+unsigned long interval = 300;                     // Интервал передачи данных 5 минут
 
 //char test_tel[13] = "+79160000000";               // укажите  телефон хозяина
 int Address_tel1     = 100;                         // Адрес в EEPROM телефона 1
@@ -109,8 +109,8 @@ void sendTemps()
 	int signal = gprs.getSignalQuality();
 	int error_All = 0;
 	EEPROM.get(Address_errorAll, error_All);
-	String toSend = formHeader()+DELIM+"temp1="+String(t1)+DELIM+"temp2="+String(t2)+DELIM+"tempint="+String(t3)+ DELIM+"slevel="+String(signal)+DELIM+"ecs="+String(errors)+DELIM+"ec="+String(error_All)+formEnd();
-	//String toSend = formHeader()+DELIM+String(t1)+DELIM+String(t2)+DELIM+String(t3)+ DELIM+String(signal)+DELIM+String(errors)+DELIM+String(error_All)+formEnd();
+	//String toSend = formHeader()+DELIM+"temp1="+String(t1)+DELIM+"temp2="+String(t2)+DELIM+"tempint="+String(t3)+ DELIM+"slevel="+String(signal)+DELIM+"ecs="+String(errors)+DELIM+"ec="+String(error_All)+formEnd();
+	String toSend = formHeader()+DELIM+String(t1)+DELIM+String(t2)+DELIM+String(t3)+ DELIM+String(signal)+DELIM+String(errors)+DELIM+String(error_All)+formEnd();
 	Serial.println(toSend);
 	Serial.println(toSend.length());
 	gprs_send(toSend);
@@ -122,10 +122,11 @@ String formHeader()
   GSM_LOCATION loc;                               // Получить время из интернета
   if (gprs.getLocation(&loc)) 
   {
- //  uptime  = String(loc.year)+'/'+ String(loc.month)+'/'+ String(loc.day)+','+String(loc.hour)+':'+ String(loc.minute)+':'+String(loc.second)+" 00";
-    uptime  = "date="+ String(loc.year)+'_'+ String(loc.month)+'_'+ String(loc.day)+','+String(loc.hour)+':'+ String(loc.minute)+':'+String(loc.second)+"00";
+   uptime  = String(loc.year)+'/'+ String(loc.month)+'/'+ String(loc.day)+','+String(loc.hour)+':'+ String(loc.minute)+':'+String(loc.second)+" 00";
+  //  uptime  = "date="+ String(loc.year)+'_'+ String(loc.month)+'_'+ String(loc.day)+','+String(loc.hour)+':'+ String(loc.minute)+':'+String(loc.second)+"00";
   }
-  return "imei=" + imei + DELIM + uptime;
+ // return "imei=" + imei + DELIM + uptime;
+   return "t1=" + imei + DELIM + uptime;
 }
 String formEnd() 
 {
@@ -163,8 +164,9 @@ if(EEPROM.read(Address_port1))
 String mytel = "mytel=" + master_tel1;
 String tel1 = "tel1=" + master_tel2;
 String tel2 = "tel2=" + master_tel3;
-return DELIM + mytel + DELIM +tel1 + DELIM + tel2;
-	//return DELIM + "mytel="+ master_tel1 + DELIM +"tel1="+ master_tel2 + DELIM + "tel2="+master_tel3;
+//return DELIM + mytel + DELIM +tel1 + DELIM + tel2;
+return DELIM + master_tel1 + DELIM + master_tel2 + DELIM + master_tel3;
+
 }
 
 
@@ -379,8 +381,6 @@ void setup()
 	if (sensor2.getAddress(deviceAddress, 0)) sensor2.setResolution(deviceAddress, 12);
 	if (sensor3.getAddress(deviceAddress, 0)) sensor2.setResolution(deviceAddress, 12);
 
-	 EEPROM.get(Address_interval, interval); 
-//	 Serial.println(interval);
 
 	for (;;) 
 	{
@@ -471,11 +471,16 @@ void setup()
 		 EEPROM.write(i,0);
 	 }
 	  EEPROM.write(0,55);
+	  EEPROM.put(Address_interval, interval);     // строка начальной установки интервалов
 	 Serial.println ("Clear EEPROM End");
 
  }
+ 	// EEPROM.put(Address_interval, interval);     // Закоментировать строку после установки интервалов
+	 EEPROM.get(Address_interval, interval); 
+	 Serial.println(interval);
 
-	setColor(COLOR_BLUE);
+	 
+	 setColor(COLOR_BLUE);
 	sendTemps();
 	setColor(COLOR_GREEN);
 
