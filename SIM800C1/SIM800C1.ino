@@ -518,7 +518,7 @@ void loop()
   }
 	unsigned long currentMillis = millis();
 
-    EEPROM.get( Address_interval, interval);                               // Получить номер телефона из EEPROM Address_interval
+    EEPROM.get( Address_interval, interval);                               // Получить интервал из EEPROM Address_interval
 	if ((unsigned long)(currentMillis - previousMillis) >= interval*1000) 
 	{
 		setColor(COLOR_BLUE);
