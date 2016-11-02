@@ -114,7 +114,8 @@ const char  txt_Interval_sec[]             PROGMEM  = "Interval sec:";
 const char  txt_free_memory[]              PROGMEM  = "\nfree memory: ";
 const char  txt_No_internet_con[]          PROGMEM  = "No internet connection";
 const char  txt_phone_ignored[]            PROGMEM  =  "phone ignored";
-
+const char  txt_commandTel1[]              PROGMEM  = "Commanda tel1";
+const char  txt_commandTel2[]              PROGMEM  = "Commanda tel2";
 
 
 const char* const table_message2[] PROGMEM =
@@ -146,7 +147,10 @@ const char* const table_message2[] PROGMEM =
  txt_Interval_sec,            // 24 "Interval sec:";
  txt_free_memory,             // 25 "\nfree memory: ";
  txt_No_internet_con,         // 26 "No internet connection";
- txt_phone_ignored            // 27 "phone ignored";
+ txt_phone_ignored,           // 27 "phone ignored";
+ txt_commandTel1,             // 28 "Commanda tel1";
+ txt_commandTel2              // 29 "Commanda tel2";
+
 };
 
 char bufmessage[30];
@@ -456,14 +460,19 @@ void setTime(String val, String f_phone)
   {
      interval = 20;                                     // Установить интервал 20 секунд
 	 time_set = true;                                   // Установить фиксацию интервала заданного СМС
-	// Serial.println(interval);
+	 Serial.println(interval);
   } 
   else if (val.indexOf("Restart") > -1) 
   {
-     resetFunc();                                        //вызываем reset
+	  strcpy_P(bufmessage, (char*)pgm_read_word(&(table_message2[10])));
+	  Serial.print(f_phone);
+	  Serial.print("..");
+	  Serial.println(bufmessage);
+      resetFunc();                                        //вызываем reset
   } 
   else if (val.indexOf("Timeoff") > -1) 
   {
+
      time_set = false;                              // Снять фиксацию интервала заданного СМС
   } 
 }
@@ -472,7 +481,7 @@ void setup()
 {
 	con.begin(19200);
 
-	 strcpy_P(bufmessage, (char*)pgm_read_word(&(table_message2[12])));
+	strcpy_P(bufmessage, (char*)pgm_read_word(&(table_message2[12])));
 	con.println(bufmessage);            // con.println(" SIM800 setup start");     
 	pinMode(LED_RED,  OUTPUT);
 	pinMode(LED_BLUE, OUTPUT);
@@ -607,11 +616,11 @@ void loop()
 {
  if (gprs.checkSMSU()) 
   {
-	strcpy_P(bufmessage, (char*)pgm_read_word(&(table_message2[22])));
-    con.print(bufmessage);                    //  con.print("SMS:");
-    con.println(gprs.val);
+	//strcpy_P(bufmessage, (char*)pgm_read_word(&(table_message2[22])));
+ //   con.print(bufmessage);                    //  con.print("SMS:");
+ //   con.println(gprs.val);
 	strcpy_P(bufmessage, (char*)pgm_read_word(&(table_message2[23])));
-	if (gprs.val.indexOf(bufmessage) > -1)  //если обнаружен СМС (для определения звонка вместо "+CMT" вписать "RING", трубку он не берет, но реагировать на факт звонка можно)
+	if (gprs.val.indexOf("+CMT") > -1)  //если обнаружен СМС (для определения звонка вместо "+CMT" вписать "RING", трубку он не берет, но реагировать на факт звонка можно)
 	{    
 	//------------- поиск кодового слова в СМС 
 	char buf[13] ;
@@ -625,18 +634,20 @@ void loop()
 
       if (gprs.val.indexOf(master_tel2) > -1)                              //если СМС от хозяина 1
 	  {   
+		strcpy_P(bufmessage, (char*)pgm_read_word(&(table_message2[28])));
+		Serial.println(bufmessage);
 		setTime(gprs.val, master_tel2);
-		//Serial.println("Tel2");
       }
 	  else if(gprs.val.indexOf(master_tel3) > -1)                          //если СМС от хозяина 2
 	  {
-        setTime(gprs.val, master_tel3);
-		//Serial.println("Tel3");
+      	strcpy_P(bufmessage, (char*)pgm_read_word(&(table_message2[29])));
+		Serial.println(bufmessage);
+		setTime(gprs.val, master_tel3);
       }
 	  else if(gprs.val.indexOf(master_SMS_center) > -1)                    //если СМС от хозяина 2
 	  {
-        setTime(gprs.val, master_SMS_center);
-		//Serial.println("SMS centr");
+ 		Serial.println("SMS centr");
+		setTime(gprs.val, master_SMS_center);
       }
 	  else
 	  {
