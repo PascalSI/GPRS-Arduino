@@ -21,8 +21,8 @@ static const char* url1 = "http://vps3908.vps.host.ru/recieveReadings.php";
 #define NETLIGHT         3                          // Индикация NETLIGHT
 #define STATUS           9                          // Индикация STATUS
 
-#define port1           11                          // Порт управления внешними устройствами
-#define port2           12                          // Порт управления внешними устройствами
+#define port1           11                          // Порт управления внешними устройствами (незадействован)
+#define port2           12                          // Порт управления внешними устройствами (незадействован)
 
 
                                                     // Подключить  к выводу 7 сигнал RX модуля GPRS. Установить в библиотеке SIM800.h
@@ -44,7 +44,7 @@ uint32_t count  = 0;
 uint32_t errors = 0;
 String imei = "";
 String CSQ = "";                                    // Уровень сигнала приема
-//String header = "";
+String SMS_center = "SMS.RU";
 //String imei = "861445030362268";                  // Тест IMEI
 //#define DELIM "&"
 #define DELIM "@"
@@ -54,25 +54,28 @@ String CSQ = "";                                    // Уровень сигнала приема
 unsigned long time;                                 // Переменная для суточного сброса
 unsigned long time_day = 86400;                     // Переменная секунд в сутках
 unsigned long previousMillis = 0;
-//unsigned long interval = 30;                        // Интервал передачи данных 30 секунд
-unsigned long interval = 300;                     // Интервал передачи данных 5 минут
+unsigned long interval = 10;                        // Интервал передачи данных 30 секунд
+//unsigned long interval = 300;                     // Интервал передачи данных 5 минут
+bool time_set = false;                              // Фиксировать интервал заданный СМС
 
-//char test_tel[13] = "+79160000000";               // укажите  телефон хозяина
-int Address_tel1     = 100;                         // Адрес в EEPROM телефона 1
-int Address_tel2     = 120;                         // Адрес в EEPROM телефона 2
-int Address_tel3     = 140;                         // Адрес в EEPROM телефона 3
-int Address_errorAll = 160;                         // Адрес в EEPROM счетчика общих ошибок
-int Address_port1    = 180;                         // Адрес в EEPROM телефона 3
-int Address_port2    = 190;                         // Адрес в EEPROM телефона 3
-int Address_interval = 200;                         // Адрес в EEPROM телефона 3
+
+int Address_tel1       = 100;                         // Адрес в EEPROM телефона 1
+int Address_tel2       = 120;                         // Адрес в EEPROM телефона 2
+int Address_tel3       = 140;                         // Адрес в EEPROM телефона 3
+int Address_errorAll   = 160;                         // Адрес в EEPROM счетчика общих ошибок
+int Address_port1      = 180;                         // Адрес в EEPROM порт данных (незадействован)
+int Address_port2      = 190;                         // Адрес в EEPROM порт данных (незадействован)
+int Address_interval   = 200;                         // Адрес в EEPROM величины интервала
+int Address_SMS_center = 220;                         // Адрес в EEPROM SMS центра
 
 char data_tel[13];                                  // Буфер для номера телефоа
 
-int dataport1 = 0;
-int dataport2 = 0;
+int dataport1 = 0;                                  // порт данных (незадействован)
+int dataport2 = 0;                                  // порт данных (незадействован)
 
 
-uint8_t oneWirePins[]={16, 17, 4};                    //OneWire DS18x20 temperature sensors on these wires
+uint8_t oneWirePins[]={16, 17, 4};                     //номера датчиков температуры DS18x20. Переставляя номера можно устанавливать очередность передачи в строке.
+                                                       // Сейчас первым идет внутренний датчик.
 uint8_t oneWirePinsCount=sizeof(oneWirePins)/sizeof(int);
 
 OneWire ds18x20_1(oneWirePins[0]);
@@ -82,9 +85,9 @@ DallasTemperature sensor1(&ds18x20_1);
 DallasTemperature sensor2(&ds18x20_2);
 DallasTemperature sensor3(&ds18x20_3);
 
-void(* resetFunc) (void) = 0;                       // объявляем функцию reset
+void(* resetFunc) (void) = 0;                         // объявляем функцию reset
 
- void setColor(bool red, bool green, bool blue)
+ void setColor(bool red, bool green, bool blue)       // Включение цвета свечения трехцветного светодиода.
  {
       #ifdef COMMON_ANODE
         red = !red;
@@ -111,7 +114,8 @@ void sendTemps()
 	EEPROM.get(Address_errorAll, error_All);
 	//String toSend = formHeader()+DELIM+"temp1="+String(t1)+DELIM+"temp2="+String(t2)+DELIM+"tempint="+String(t3)+ DELIM+"slevel="+String(signal)+DELIM+"ecs="+String(errors)+DELIM+"ec="+String(error_All)+formEnd();
 	String toSend = formHeader()+DELIM+String(t1)+DELIM+String(t2)+DELIM+String(t3)+ DELIM+String(signal)+DELIM+String(errors)+DELIM+String(error_All)+formEnd();
-	Serial.println(toSend);
+//	Serial.println(toSend);
+    Serial.print("String length: ");
 	Serial.println(toSend.length());
 	gprs_send(toSend);
 }
@@ -142,6 +146,9 @@ String formEnd()
 	EEPROM.get(Address_tel3, buf);
 	String master_tel3(buf);
 	//Serial.println(master_tel3);
+	 EEPROM.get(Address_SMS_center, SMS_center);   //Получить из EEPROM СМС центр
+	//Serial.println(SMS_center);
+
 if(EEPROM.read(Address_port1))
  {
  
@@ -165,7 +172,7 @@ String mytel = "mytel=" + master_tel1;
 String tel1 = "tel1=" + master_tel2;
 String tel2 = "tel2=" + master_tel3;
 //return DELIM + mytel + DELIM +tel1 + DELIM + tel2;
-return DELIM + master_tel1 + DELIM + master_tel2 + DELIM + master_tel3;
+return DELIM + master_tel1 + DELIM + master_tel2 + DELIM + master_tel3 + DELIM + SMS_center;
 
 }
 
@@ -199,7 +206,7 @@ if(start_error)                        // Корректируем ошибку при первом запуске
     errors++;
 	errorAllmem();
 }
-	if (errors > 30)
+	if (errors > 20)
 	  {
 			//con.println("Number of transmission errors exceeded");
 			resetFunc();          // вызываем reset после 30 ошибок
@@ -219,7 +226,7 @@ if(start_error)                        // Корректируем ошибку при первом запуске
   {
     errors++;
 	errorAllmem();
-	if (errors > 30)
+	if (errors > 20)
 	  {
 			//con.println("The number of server errors exceeded");
 			resetFunc();         // вызываем reset после 30 ошибок
@@ -240,12 +247,15 @@ if(start_error)                        // Корректируем ошибку при первом запуске
 		String commData = command.substring(2, 10);    // Выделить строку с данными
 		unsigned long interval1 = commData.toInt();    // Преобразовать строку данных в число 
 		con.println(interval1);
-		if(interval1 > 5 && interval1 < 86401)         // Ограничить интервалы от 5секунд до 24 часов.
+		if(interval1 > 10 && interval1 < 86401)         // Ограничить интервалы от 10  секунд до 24 часов.
 		{
-		  if(interval1!=interval)
+		  if(interval1!=interval)                       // Если информиция не изменилась - не писать в EEPROM
 		  {
-			  interval = interval1;                    // Переключить интервал передачи на сервер
-			  EEPROM.put(Address_interval, interval);  // Получить номер телефона из EEPROM Address_interval
+			 if(!time_set)                              // Если нет команды фиксации интервала от СМС 
+			 {
+			    interval = interval1;                    // Переключить интервал передачи на сервер
+			    EEPROM.put(Address_interval, interval);  // Записать интервал EEPROM , полученный от сервера
+			 }
 		  }
 		}
 		con.println(interval);
@@ -256,7 +266,7 @@ if(start_error)                        // Корректируем ошибку при первом запуске
 	    command.remove(0, 2);                          // Получить данные номера телефона от сервера
 		EEPROM.get(Address_tel1, data_tel);            // Получить номер телефона из EEPROM
 		String num_tel(data_tel);
-		if (command != num_tel) 
+		if (command != num_tel)                        // Если информиция не изменилась - не писать в EEPROM
 		{
 			Serial.println("no compare");
 			for(int i=0;i<13;i++)
@@ -271,7 +281,7 @@ if(start_error)                        // Корректируем ошибку при первом запуске
 	    command.remove(0, 2);                          // Получить данные номера телефона от сервера
 		EEPROM.get(Address_tel2, data_tel);            // Получить номер телефона из EEPROM
 		String num_tel(data_tel);
-		if (command != num_tel) 
+		if (command != num_tel)                        // Если информиция не изменилась - не писать в EEPROM
 		{
 			//Serial.println("no compare");
 			for(int i=0;i<13;i++)
@@ -285,7 +295,7 @@ if(start_error)                        // Корректируем ошибку при первом запуске
 	    command.remove(0, 2);                          // Получить данные номера телефона от сервера
 		EEPROM.get(Address_tel3, data_tel);            // Получить номер телефона из EEPROM
 		String num_tel(data_tel);
-		if (command != num_tel) 
+		if (command != num_tel)                        // Если информиция не изменилась - не писать в EEPROM
 		{
 			//Serial.println("no compare");
 			for(int i=0;i<13;i++)
@@ -300,15 +310,25 @@ if(start_error)                        // Корректируем ошибку при первом запуске
 	}
 	else if(var == 6)                                  // Выполнить команду 6
 	{
-
+	    command.remove(0, 2);                          // Получить данные номера телефона от сервера
+		EEPROM.get(Address_SMS_center, data_tel);      // Получить из EEPROM СМС центр
+		String num_tel(data_tel);
+		if (command != num_tel)                        // Если информиция не изменилась - не писать в EEPROM
+		{
+			//Serial.println("no compare");
+			for(int i=0;i<13;i++)
+			{
+				EEPROM.write(i+Address_SMS_center,command[i]);
+			}
+		}
 	}
 	else if(var == 7)                                  // Выполнить команду 7
 	{
-		//  Здесь и далее можно добавить до 98 команд  
+		time_set = false;                              // Снять фиксацию интервала заданного СМС
 	}
 	else if(var == 8)                                  // Выполнить команду 8
 	{
-		//  Здесь и далее можно добавить до 98 команд  
+		//  Здесь и далее можно добавить до 90 команд  
 	}
 	else
 	{
@@ -345,23 +365,28 @@ void setTime(String val, String f_phone)
 {
   if (val.indexOf("Timeset") > -1) 
   {
-     interval = 20000;    // Установить интервал 20 секунд
+     interval = 20000;                                  // Установить интервал 20 секунд
+	 time_set = true;                                   // Установить фиксацию интервала заданного СМС
   } 
   else if (val.indexOf("Restart") > -1) 
   {
-     resetFunc();             //вызываем reset
+     resetFunc();                                        //вызываем reset
+  } 
+  else if (val.indexOf("Timeoff") > -1) 
+  {
+     time_set = false;                              // Снять фиксацию интервала заданного СМС
   } 
 }
 
 void setup()
 {
 	con.begin(19200);
-	con.println("SIM800 setup start");
+	con.println(" SIM800 setup start");
 	pinMode(LED_RED,  OUTPUT);
 	pinMode(LED_BLUE, OUTPUT);
 	pinMode(LED_GREEN,OUTPUT);
-	pinMode(NETLIGHT ,INPUT);     // Индикация NETLIGHT
-	pinMode(STATUS ,INPUT);       // Индикация STATUS
+	pinMode(NETLIGHT ,INPUT);                      // Индикация NETLIGHT
+	pinMode(STATUS ,INPUT);                        // Индикация STATUS
 
 	setColor(COLOR_RED);
 	delay(300);
@@ -476,11 +501,14 @@ void setup()
 
  }
  	// EEPROM.put(Address_interval, interval);     // Закоментировать строку после установки интервалов
-	 EEPROM.get(Address_interval, interval); 
-	 Serial.println(interval);
-
+     EEPROM.put(Address_SMS_center, SMS_center);   // Закоментировать строку после установки СМС центра
+ 	 EEPROM.get(Address_interval, interval);       //Получить из EEPROM интервал
+	 EEPROM.get(Address_SMS_center, SMS_center);   //Получить из EEPROM СМС центр
+	 con.print("\nInterval: ");
+	 con.println(interval);
+	 con.println(SMS_center);
 	 
-	 setColor(COLOR_BLUE);
+	setColor(COLOR_BLUE);
 	sendTemps();
 	setColor(COLOR_GREEN);
 
@@ -504,6 +532,9 @@ void loop()
 	EEPROM.get(Address_tel3, buf);                                         // Восстановить телефон хозяина 2
 	String master_tel3(buf);
 
+	EEPROM.get(Address_SMS_center, buf);                                         // Восстановить телефон СМС центра
+	String master_SMS_center(buf);
+
       if (gprs.val.indexOf(master_tel2) > -1)                              //если СМС от хозяина 1
 	  {   
 		setTime(gprs.val, master_tel2);
@@ -512,6 +543,11 @@ void loop()
 	  {
         setTime(gprs.val, master_tel3);
       }
+	  else if(gprs.val.indexOf(master_SMS_center) > -1)                          //если СМС от хозяина 2
+	  {
+        setTime(gprs.val, master_SMS_center);
+      }
+
     }
 	    
 		gprs.val = "";
@@ -521,6 +557,8 @@ void loop()
     EEPROM.get( Address_interval, interval);                               // Получить интервал из EEPROM Address_interval
 	if ((unsigned long)(currentMillis - previousMillis) >= interval*1000) 
 	{
+		Serial.print("Interval sec:");
+		Serial.println((currentMillis-previousMillis)/1000);
 		setColor(COLOR_BLUE);
 		previousMillis = currentMillis;
 		sendTemps();
