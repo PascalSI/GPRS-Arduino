@@ -283,6 +283,7 @@ bool CGPRS_SIM800::checkSMSU()
       val += char(ch);                   //сохраняем входную строку в переменную val
       delay(10);
     }
+	Serial.println(val);
     return true;
   }
   return false; 
