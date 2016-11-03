@@ -614,12 +614,21 @@ void setup()
 
 void loop()
 {
+	if(gprs.checkSMS())
+	{
+		strcpy_P(bufmessage, (char*)pgm_read_word(&(table_message2[22])));
+		con.print(bufmessage);                    //  con.print("SMS:");
+		con.println(gprs.buffer);
+	}
+
+/*
+
  if (gprs.checkSMSU()) 
   {
-	//strcpy_P(bufmessage, (char*)pgm_read_word(&(table_message2[22])));
- //   con.print(bufmessage);                    //  con.print("SMS:");
- //   con.println(gprs.val);
-	strcpy_P(bufmessage, (char*)pgm_read_word(&(table_message2[23])));
+	strcpy_P(bufmessage, (char*)pgm_read_word(&(table_message2[22])));
+    con.print(bufmessage);                    //  con.print("SMS:");
+    con.println(gprs.val);
+	//strcpy_P(bufmessage, (char*)pgm_read_word(&(table_message2[23])));
 	if (gprs.val.indexOf("+CMT") > -1)  //если обнаружен СМС (для определения звонка вместо "+CMT" вписать "RING", трубку он не берет, но реагировать на факт звонка можно)
 	{    
 	//------------- поиск кодового слова в СМС 
@@ -658,6 +667,10 @@ void loop()
 	    
 		gprs.val = "";
   }
+
+
+
+ */
 	unsigned long currentMillis = millis();
 	if(!time_set)                                                               // 
 	{

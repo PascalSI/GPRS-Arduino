@@ -36,26 +36,27 @@ bool CGPRS_SIM800::init(int PWR_On,int SIM800_RESET_PIN,int LED13)
     if (sendCommand("AT")) 
 	{
 		strcpy_P(bufcom, (char*)pgm_read_word(&(table_message[1])));
- 	//	sendCommand("AT+IPR=19200");                    // Установить скорость обмена
-		sendCommand(bufcom);                            // Установить скорость обмена
+ 		sendCommand(bufcom);         	                                //	sendCommand("AT+IPR=19200");   // Установить скорость обмена
 		strcpy_P(bufcom, (char*)pgm_read_word(&(table_message[0])));
-        //sendCommand("ATE0");                            // Отключить эхо 
+        //sendCommand("ATE0");                                          // Отключить эхо 
         sendCommand(bufcom);   
 		strcpy_P(bufcom, (char*)pgm_read_word(&(table_message[2])));
-		sendCommand(bufcom);                              // 1 – нормальный режим (по умолчанию). Второй параметр 1
-		//sendCommand("AT+CFUN=1");                       // 1 – нормальный режим (по умолчанию). Второй параметр 1 – перезагрузить (доступно только в нормальном режиме, т.е. параметры = 1,1)
+		sendCommand(bufcom);                                            // 1 – нормальный режим (по умолчанию). Второй параметр 1
+		//sendCommand("AT+CFUN=1");                                     // 1 – нормальный режим (по умолчанию). Второй параметр 1 – перезагрузить (доступно только в нормальном режиме, т.е. параметры = 1,1)
   	    strcpy_P(bufcom, (char*)pgm_read_word(&(table_message[3])));
-		sendCommand(bufcom);                              // режим кодировки СМС - обычный (для англ.)
-		//sendCommand("AT+CMGF=1");                       // режим кодировки СМС - обычный (для англ.)
+		sendCommand(bufcom);                                            // режим кодировки СМС - обычный (для англ.)
+		//sendCommand("AT+CMGF=1");                                     // режим кодировки СМС - обычный (для англ.)
 		strcpy_P(bufcom, (char*)pgm_read_word(&(table_message[4])));
-		sendCommand(bufcom);                                         // включаем АОН
-		//sendCommand("AT+CLIP=1");                        // включаем АОН
+		sendCommand(bufcom);                                            // включаем АОН
+		//sendCommand("AT+CLIP=1");                                     // включаем АОН
 		strcpy_P(bufcom, (char*)pgm_read_word(&(table_message[5])));
-		sendCommand(bufcom);                                         // режим кодировки текста
-		//sendCommand("AT+CSCS=\"GSM\"");                            // режим кодировки текста
+		sendCommand(bufcom);                                            // режим кодировки текста
+		//sendCommand("AT+CSCS=\"GSM\"");                               // режим кодировки текста
 		strcpy_P(bufcom, (char*)pgm_read_word(&(table_message[6])));
-		sendCommand(bufcom);                                        // отображение смс в терминале сразу после приема (без этого 
-		//sendCommand("AT+CNMI=2,2");                               // отображение смс в терминале сразу после приема (без этого сообщения молча падают в память)tln("AT+CSCS=\"GSM\""); 
+		//sendCommand(bufcom);                                          // отображение смс в терминале сразу после приема (без этого 
+		//sendCommand("AT+CNMI=2,2");                                   // отображение смс в терминале сразу после приема (без этого сообщения молча падают в память)tln("AT+CSCS=\"GSM\""); 
+		sendCommand("AT+CMGDA=\"DEL ALL\"");                            // AT+CMGDA=«DEL ALL» команда удалит все сообщения
+		
 		return true;
     }
     return false;
@@ -271,7 +272,22 @@ bool CGPRS_SIM800::getOperatorName()
   }
   return false;
 }
-
+bool CGPRS_SIM800::checkSMS()
+{
+  if (sendCommand("AT+CMGR=1")   // if (sendCommand("AT+CMGR=1", "+CMGR:", "ERROR") == 1) 
+  {
+    // reads the data of the SMS
+    Serial.println(buffer);
+    sendCommand(0, 100, "\r\n");
+    if (sendCommand(0)) 
+	{
+      // remove the SMS
+      sendCommand("AT+CMGD=1");
+      return true;
+    }
+  }
+  return false; 
+}
 bool CGPRS_SIM800::checkSMSU()
 {
  if (SIM_SERIAL.available())             //есть данные от GSM модуля

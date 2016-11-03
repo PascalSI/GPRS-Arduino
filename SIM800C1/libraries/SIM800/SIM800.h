@@ -191,7 +191,7 @@ public:
     char buffer[128];
     byte httpState;
 	String val = "";
-	//String telefon = "";
+
 private:
     byte checkbuffer(const char* expected1, const char* expected2 = 0, unsigned int timeout = 2000);
     void purgeSerial();
@@ -203,7 +203,7 @@ private:
     String cont = "";
 	int _PWR_On           ;                            // Включение питания модуля SIM800
     int _SIM800_RESET_PIN ;                            // Сброс модуля SIM800
-    int _LED13            ;                             // Индикация светодиодом
+    int _LED13            ;                            // Индикация светодиодом
 	char bufcom[40];
 	char bufcom1[20];
 	int ch = 0;
