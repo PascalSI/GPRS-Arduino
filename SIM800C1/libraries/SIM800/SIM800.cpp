@@ -53,7 +53,7 @@ bool CGPRS_SIM800::init(int PWR_On,int SIM800_RESET_PIN,int LED13)
 		sendCommand(bufcom);                                            // режим кодировки текста
 		//sendCommand("AT+CSCS=\"GSM\"");                               // режим кодировки текста
 		strcpy_P(bufcom, (char*)pgm_read_word(&(table_message[6])));
-		//sendCommand(bufcom);                                          // отображение смс в терминале сразу после приема (без этого 
+		sendCommand(bufcom);                                            // отображение смс в терминале сразу после приема (без этого 
 		//sendCommand("AT+CNMI=2,2");                                   // отображение смс в терминале сразу после приема (без этого сообщения молча падают в память)tln("AT+CSCS=\"GSM\""); 
 		sendCommand("AT+CMGDA=\"DEL ALL\"");                            // AT+CMGDA=«DEL ALL» команда удалит все сообщения
 		
@@ -274,13 +274,11 @@ bool CGPRS_SIM800::getOperatorName()
 }
 bool CGPRS_SIM800::checkSMS()
 {
-  if (sendCommand("AT+CMGR=1")   // if (sendCommand("AT+CMGR=1", "+CMGR:", "ERROR") == 1) 
+ if (sendCommand("AT+CMGR=1", "+CMGR:", "ERROR") == 1) 
   {
     // reads the data of the SMS
-    Serial.println(buffer);
     sendCommand(0, 100, "\r\n");
-    if (sendCommand(0)) 
-	{
+    if (sendCommand(0)) {
       // remove the SMS
       sendCommand("AT+CMGD=1");
       return true;

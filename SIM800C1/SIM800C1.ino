@@ -116,6 +116,7 @@ const char  txt_No_internet_con[]          PROGMEM  = "No internet connection";
 const char  txt_phone_ignored[]            PROGMEM  =  "phone ignored";
 const char  txt_commandTel1[]              PROGMEM  = "Commanda tel1";
 const char  txt_commandTel2[]              PROGMEM  = "Commanda tel2";
+const char  txt_Unknown_command[]          PROGMEM  = "Unknown command";
 
 
 const char* const table_message2[] PROGMEM =
@@ -149,8 +150,8 @@ const char* const table_message2[] PROGMEM =
  txt_No_internet_con,         // 26 "No internet connection";
  txt_phone_ignored,           // 27 "phone ignored";
  txt_commandTel1,             // 28 "Commanda tel1";
- txt_commandTel2              // 29 "Commanda tel2";
-
+ txt_commandTel2,             // 29 "Commanda tel2";
+ txt_Unknown_command          // 30 "Unknown command"
 };
 
 char bufmessage[30];
@@ -468,13 +469,18 @@ void setTime(String val, String f_phone)
 	  Serial.print(f_phone);
 	  Serial.print("..");
 	  Serial.println(bufmessage);
+	  delay(1000);
       resetFunc();                                        //вызываем reset
   } 
   else if (val.indexOf("Timeoff") > -1) 
   {
-
      time_set = false;                              // Снять фиксацию интервала заданного СМС
   } 
+  else
+  {
+	   strcpy_P(bufmessage, (char*)pgm_read_word(&(table_message2[30])));
+	   Serial.println(bufmessage);         // Serial.println("Unknown command");
+  }
 }
 
 void setup()
@@ -614,14 +620,6 @@ void setup()
 
 void loop()
 {
-	if(gprs.checkSMS())
-	{
-		strcpy_P(bufmessage, (char*)pgm_read_word(&(table_message2[22])));
-		con.print(bufmessage);                    //  con.print("SMS:");
-		con.println(gprs.buffer);
-	}
-
-/*
 
  if (gprs.checkSMSU()) 
   {
@@ -669,8 +667,7 @@ void loop()
   }
 
 
-
- */
+ 
 	unsigned long currentMillis = millis();
 	if(!time_set)                                                               // 
 	{
