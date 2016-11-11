@@ -55,7 +55,7 @@ String zero_tel   = "";
 unsigned long time;                                 // Переменная для суточного сброса
 unsigned long time_day = 86400;                     // Переменная секунд в сутках
 unsigned long previousMillis = 0;
-unsigned long interval = 10;                        // Интервал передачи данных 30 секунд
+unsigned long interval = 10;                        // Интервал передачи данных 10 секунд
 //unsigned long interval = 300;                     // Интервал передачи данных 5 минут
 bool time_set = false;                              // Фиксировать интервал заданный СМС
 
